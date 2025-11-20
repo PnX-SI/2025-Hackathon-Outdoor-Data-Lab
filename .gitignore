@@ -3,6 +3,11 @@
 __pycache__/
 *.py[cod]
 
+
+
+hackatonPNE/activity/static/data/*.geojson
+
+
 # Distribution / packaging
 .Python
 env/
