@@ -64,9 +64,12 @@ const onMonthChanged = (month) => {
   currentMonth.value = month
 }
 
-const onDateRangeChanged = ({ beginDate: b, endDate: e }) => {
-  beginDate.value = b
-  endDate.value = e
+const pad = (n) => n.toString().padStart(2, '0')
+const currentYear = new Date().getFullYear()
+const onDateRangeChanged = ({ beginDay, beginMonth, endDay, endMonth }) => {
+  // Convert to ISO date strings (YYYY-MM-DD)
+  beginDate.value = `${currentYear}-${pad(beginMonth)}-${pad(beginDay)}`
+  endDate.value = `${currentYear}-${pad(endMonth)}-${pad(endDay)}`
 }
 const onZoomChanged = (zoom) => {
   zoomLevel.value = zoom
