@@ -88,7 +88,7 @@ const onMapClick = (attributes) => {
 const clearAttributes = () => {
   selectedAttributes.value = null
   if (mapComponent.value) {
-    mapComponent.value.clearSensitivityArea()
+    mapComponent.value.clearAreas()
   }
   // Clear from localStorage
   try {
@@ -167,11 +167,15 @@ const showRegulatedArea = (areaOrStr) => {
 
 const updateDisplayedAreas = () => {
   if (mapComponent.value) {
-    const allAreas = [
-      ...Array.from(displayedSensitivityAreas.value),
-      ...Array.from(displayedRegulatedAreas.value)
-    ]
-    mapComponent.value.showSensitivityAreas(allAreas)
+    const sensitivityAreas = Array.from(displayedSensitivityAreas.value).map(str => ({
+      type: 'sensitivity',
+      coordinates: JSON.parse(str)
+    }))
+    const regulatedAreas = Array.from(displayedRegulatedAreas.value).map(str => ({
+      type: 'regulated',
+      coordinates: JSON.parse(str)
+    }))
+    mapComponent.value.showAreas([...sensitivityAreas, ...regulatedAreas])
   }
 }
 

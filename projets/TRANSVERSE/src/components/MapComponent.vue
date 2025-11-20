@@ -53,32 +53,57 @@ const createGeoJSON = (month) => {
   }
 }
 
-const showSensitivityAreas = (coordinatesArr) => {
-  // coordinatesArr: array of JSON.stringify(coordinates)
-  const features = coordinatesArr.map(str => {
-    const coordinates = JSON.parse(str)
-    return {
+const showAreas = (areasArr) => {
+  // areasArr: array of { type: 'sensitivity'|'regulated', coordinates: [] }
+  const sensitivityFeatures = []
+  const regulatedFeatures = []
+
+  areasArr.forEach(areaObj => {
+    const feature = {
       type: 'Feature',
       geometry: {
         type: 'Polygon',
-        coordinates: [coordinates]
+        coordinates: [areaObj.coordinates]
       }
     }
+    if (areaObj.type === 'sensitivity') {
+      sensitivityFeatures.push(feature)
+    } else if (areaObj.type === 'regulated') {
+      regulatedFeatures.push(feature)
+    }
   })
-  const geojson = {
+
+  const sensitivityGeojson = {
     type: 'FeatureCollection',
-    features
+    features: sensitivityFeatures
   }
-  const source = map.getSource('sensitivity-area')
-  if (source) {
-    source.setData(geojson)
+  const regulatedGeojson = {
+    type: 'FeatureCollection',
+    features: regulatedFeatures
+  }
+
+  const sensitivitySource = map.getSource('sensitivity-area')
+  if (sensitivitySource) {
+    sensitivitySource.setData(sensitivityGeojson)
+  }
+
+  const regulatedSource = map.getSource('regulated-area')
+  if (regulatedSource) {
+    regulatedSource.setData(regulatedGeojson)
   }
 }
 
-const clearSensitivityArea = () => {
-  const source = map.getSource('sensitivity-area')
-  if (source) {
-    source.setData({
+const clearAreas = () => {
+  const sensitivitySource = map.getSource('sensitivity-area')
+  if (sensitivitySource) {
+    sensitivitySource.setData({
+      type: 'FeatureCollection',
+      features: []
+    })
+  }
+  const regulatedSource = map.getSource('regulated-area')
+  if (regulatedSource) {
+    regulatedSource.setData({
       type: 'FeatureCollection',
       features: []
     })
@@ -91,7 +116,7 @@ watch(() => props.currentMonth, () => {
     if (source) {
       source.setData(createGeoJSON(props.currentMonth))
     }
-    clearSensitivityArea()
+    clearAreas()
   }
 })
 
@@ -143,6 +168,15 @@ onMounted(() => {
       }
     })
 
+    // Add regulated area source
+    map.addSource('regulated-area', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      }
+    })
+
     // Add layers
     map.addLayer({
       id: 'sensitivity-area-fill',
@@ -160,6 +194,26 @@ onMounted(() => {
       source: 'sensitivity-area',
       paint: {
         'line-color': '#ff0000',
+        'line-width': 2
+      }
+    })
+
+    map.addLayer({
+      id: 'regulated-area-fill',
+      type: 'fill',
+      source: 'regulated-area',
+      paint: {
+        'fill-color': '#ba68c8',
+        'fill-opacity': 0.3
+      }
+    })
+
+    map.addLayer({
+      id: 'regulated-area-outline',
+      type: 'line',
+      source: 'regulated-area',
+      paint: {
+        'line-color': '#8e24aa',
         'line-width': 2
       }
     })
@@ -211,8 +265,8 @@ onUnmounted(() => {
 })
 
 defineExpose({
-  showSensitivityAreas,
-  clearSensitivityArea
+  showAreas,
+  clearAreas
 })
 </script>
 
