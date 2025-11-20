@@ -31,7 +31,7 @@
           <template v-if="key === 'attributes'">
             <div class="attributes-sections">
               <div v-if="filteredSensitivityAreas && filteredSensitivityAreas.length > 0" class="attributes-section">
-                <h4>Sensitivity Areas</h4>
+                <h4>Zones Sensibles</h4>
                 <div
                   v-for="(area, index) in filteredSensitivityAreas"
                   :key="'sensitivity-' + index"
@@ -47,13 +47,13 @@
                     @click="handleShowSensitivityArea(area)"
                     class="show-area-btn small"
                   >
-                    Show on Map
+                    Afficher sur la carte
                   </button>
                 </div>
               </div>
 
               <div v-if="filteredRegulatedAreas && filteredRegulatedAreas.length > 0" class="attributes-section">
-                <h4>Regulated Areas</h4>
+                <h4>Zones règlementaires</h4>
                 <div
                   v-for="(area, index) in filteredRegulatedAreas"
                   :key="'regulated-' + index"
@@ -68,7 +68,7 @@
                     @click="handleShowRegulatedArea(area)"
                     class="show-area-btn small"
                   >
-                    Show on Map
+                    Afficher sur la carte
                   </button>
                 </div>
               </div>

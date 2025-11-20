@@ -1,7 +1,7 @@
 <template>
   <div class="date-range">
     <div class="date-select-group">
-      <label>Begin day:</label>
+      <label>Début:</label>
       <select v-model="beginDay" @change="emitRange">
         <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
       </select>
@@ -10,7 +10,7 @@
       </select>
     </div>
     <div class="date-select-group" style="margin-left:16px">
-      <label>End day:</label>
+      <label>Fin:</label>
       <select v-model="endDay" @change="emitRange">
         <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
       </select>

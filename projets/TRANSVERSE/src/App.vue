@@ -3,9 +3,9 @@
     <div id="time-selector">
       <TimeSelector @date-range-changed="onDateRangeChanged" />
       <span id="selected-info" style="margin-left: auto; font-size: 14px; display:flex; gap:12px; align-items:center;">
-        <span>Begin: <strong>{{ beginDate || '—' }}</strong></span>
-        <span>End: <strong>{{ endDate || '—' }}</strong></span>
-        <span>Current zoom: <span id="zoom-level">{{ zoomLevel.toFixed(1) }}</span></span>
+        <span>Début: <strong>{{ beginDate || '—' }}</strong></span>
+        <span>Fin: <strong>{{ endDate || '—' }}</strong></span>
+        <span>Zoom actuel: <span id="zoom-level">{{ zoomLevel.toFixed(1) }}</span></span>
       </span>
     </div>
 
