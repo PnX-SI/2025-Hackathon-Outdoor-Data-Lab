@@ -14,22 +14,13 @@ DIR_BIN = .venv/bin/
 
 -include Makefile.local
 
-###########################
-#           DB            #
-###########################
-
-.PHONY: launchdb
-launchdb:
-	docker compose up
-
-.PHONY: install_req
-install_req:
-	python3 -m venv .venv
-	. .venv/bin/activate && pip install -r requirements.txt
+.PHONY: build_app
+build_app:
+	docker build  .
 
 .PHONY: serve
-serve: install_req
-	python manage.py runserver
+serve:
+	docker compose up
 
 define display_cmd
 	@$(PRINT_COLOR) "\n$(COLOR_SUCCESS) ########################## $(COLOR_RESET)\n"

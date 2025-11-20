@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.gis',
+    'biodiversity',
+    'activity',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -70,15 +73,6 @@ WSGI_APPLICATION = 'hackatonPNE.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 
 DATABASES = {
     "default": {
@@ -86,8 +80,7 @@ DATABASES = {
         "NAME": "hackathondb",
         "USER": "hackathonadmin",
         "PASSWORD": "hackathonpasswd",
-        "HOST": "localhost",
-        # "HOST": "postgres",
+        "HOST": "postgres",
         "PORT": "5432"
     }
 }
