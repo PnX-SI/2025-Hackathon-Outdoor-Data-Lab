@@ -52,6 +52,8 @@ const updateWindowWidth = () => {
 
 onMounted(() => {
   window.addEventListener('resize', updateWindowWidth)
+  // Restore the selected feature from localStorage
+  restoreSelectedFeature()
 })
 
 onUnmounted(() => {
@@ -72,12 +74,35 @@ const onZoomChanged = (zoom) => {
 
 const onMapClick = (attributes) => {
   selectedAttributes.value = attributes
+  // Save to localStorage
+  try {
+    localStorage.setItem('map-selected-feature', JSON.stringify(attributes))
+  } catch (e) {
+    console.warn('Could not save selected feature to localStorage:', e)
+  }
 }
 
 const clearAttributes = () => {
   selectedAttributes.value = null
   if (mapComponent.value) {
     mapComponent.value.clearSensitivityArea()
+  }
+  // Clear from localStorage
+  try {
+    localStorage.removeItem('map-selected-feature')
+  } catch (e) {
+    console.warn('Could not clear selected feature from localStorage:', e)
+  }
+}
+
+const restoreSelectedFeature = () => {
+  try {
+    const savedFeature = localStorage.getItem('map-selected-feature')
+    if (savedFeature) {
+      selectedAttributes.value = JSON.parse(savedFeature)
+    }
+  } catch (e) {
+    console.warn('Could not restore selected feature from localStorage:', e)
   }
 }
 
