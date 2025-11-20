@@ -25,7 +25,7 @@ const props = defineProps({
 const emit = defineEmits(['zoom-changed', 'map-click'])
 
 let map = null
-let zoom = ref(11)
+let zoom = ref(10)
 
 const onZoomChanged = () => {
   zoom.value = Math.round(map.getZoom() * 10) / 10
