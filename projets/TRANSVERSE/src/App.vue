@@ -115,14 +115,43 @@ const displayedSensitivityMap = ref(new Map()) // str -> area obj
 const displayedRegulatedMap = ref(new Map())
 
 const areaPeriodOverlapsFilter = (area, filterStartIso, filterEndIso) => {
+  // Compare periods on a circular year using day-of-year so wrapped periods
+  // (e.g., Nov -> Mar) are handled correctly. Both the area's period and
+  // the filter period may wrap across year boundary.
+  const toDayOfYear = (d) => {
+    // use a fixed non-leap year so day-of-year mapping is consistent
+    const year = 2001
+    const date = new Date(year, d[1] - 1, d[0])
+    const start = new Date(year, 0, 1)
+    return Math.floor((date - start) / (24 * 60 * 60 * 1000)) + 1
+  }
+
   const nowYear = new Date().getFullYear()
   const [start, end] = area.period || []
   if (!start || !end) return true
-  const startDate = new Date(nowYear, (start[1] - 1), start[0])
-  const endDate = new Date(nowYear, (end[1] - 1), end[0])
-  const filterStart = filterStartIso ? new Date(filterStartIso) : new Date(nowYear, 0, 1)
-  const filterEnd = filterEndIso ? new Date(filterEndIso) : new Date(nowYear, 11, 31)
-  return startDate <= filterEnd && filterStart <= endDate
+
+  // compute filter start/end day-of-year from ISO strings or defaults
+  const parseIsoToDay = (iso, defaultDay) => {
+    if (!iso) return defaultDay
+    const d = new Date(iso)
+    // iso includes year; we only need month/day -> convert to same reference year
+    return toDayOfYear([d.getDate(), d.getMonth() + 1])
+  }
+
+  const areaStartDoY = toDayOfYear(start)
+  const areaEndDoY = toDayOfYear(end)
+  const filterStartDoY = parseIsoToDay(filterStartIso, 1)
+  const filterEndDoY = parseIsoToDay(filterEndIso, 365)
+
+  const inInterval = (day, s, e) => (s <= e ? (day >= s && day <= e) : (day >= s || day <= e))
+
+  // intervals overlap if any endpoint of one lies inside the other
+  if (inInterval(areaStartDoY, filterStartDoY, filterEndDoY)) return true
+  if (inInterval(areaEndDoY, filterStartDoY, filterEndDoY)) return true
+  if (inInterval(filterStartDoY, areaStartDoY, areaEndDoY)) return true
+  if (inInterval(filterEndDoY, areaStartDoY, areaEndDoY)) return true
+
+  return false
 }
 
 const showSensitivityArea = (areaOrStr) => {
@@ -187,15 +216,7 @@ const filteredSensitivityCoordinates = computed(() => {
     const attrs = JSON.parse(selectedAttributes.value.attributes)
     if (!attrs.sensitivityAreas) return new Set()
     return new Set(attrs.sensitivityAreas.filter(area => {
-      // Use same filtering as AttributesPanel
-      const nowYear = new Date().getFullYear()
-      const [start, end] = area.period || []
-      if (!start || !end) return true
-      const startDate = new Date(nowYear, (start[1] - 1), start[0])
-      const endDate = new Date(nowYear, (end[1] - 1), end[0])
-      const filterStart = beginDate.value ? new Date(beginDate.value) : new Date(nowYear, 0, 1)
-      const filterEnd = endDate.value ? new Date(endDate.value) : new Date(nowYear, 11, 31)
-      return startDate <= filterEnd && filterStart <= endDate
+      return areaPeriodOverlapsFilter(area, beginDate.value, endDate.value)
     }).map(area => JSON.stringify(area.coordinates)))
   } catch { return new Set() }
 })
@@ -206,15 +227,7 @@ const filteredRegulatedCoordinates = computed(() => {
     const attrs = JSON.parse(selectedAttributes.value.attributes)
     if (!attrs.regulatedAreas) return new Set()
     return new Set(attrs.regulatedAreas.filter(area => {
-      // Use same filtering as AttributesPanel
-      const nowYear = new Date().getFullYear()
-      const [start, end] = area.period || []
-      if (!start || !end) return true
-      const startDate = new Date(nowYear, (start[1] - 1), start[0])
-      const endDate = new Date(nowYear, (end[1] - 1), end[0])
-      const filterStart = beginDate.value ? new Date(beginDate.value) : new Date(nowYear, 0, 1)
-      const filterEnd = endDate.value ? new Date(endDate.value) : new Date(nowYear, 11, 31)
-      return startDate <= filterEnd && filterStart <= endDate
+      return areaPeriodOverlapsFilter(area, beginDate.value, endDate.value)
     }).map(area => JSON.stringify(area.coordinates)))
   } catch { return new Set() }
 })

@@ -135,23 +135,40 @@ const periodToDateRange = (periodArray, year) => {
   return { startDate, endDate }
 }
 
-const rangesOverlap = (aStart, aEnd, bStart, bEnd) => {
-  return aStart <= bEnd && bStart <= aEnd
-}
-
 const areaMatchesRange = (area, beginIso, endIso) => {
+  // If no filter provided, show area
   if (!beginIso && !endIso) return true
-  const begin = toDate(beginIso)
-  const end = toDate(endIso)
-  if (!area.period) return true
-  const nowYear = (new Date()).getFullYear()
-  const pr = periodToDateRange(area.period, nowYear)
-  if (!pr) return true
-  const areaStart = pr.startDate
-  const areaEnd = pr.endDate
-  const filterStart = begin || new Date(nowYear, 0, 1)
-  const filterEnd = end || new Date(nowYear, 11, 31)
-  return rangesOverlap(areaStart, areaEnd, filterStart, filterEnd)
+  if (!area || !area.period) return true
+
+  // Convert a [day, month] pair to day-of-year using a fixed non-leap year
+  const toDayOfYear = (d) => {
+    const year = 2001
+    const date = new Date(year, d[1] - 1, d[0])
+    const start = new Date(year, 0, 1)
+    return Math.floor((date - start) / (24 * 60 * 60 * 1000)) + 1
+  }
+
+  const parseIsoToDay = (iso, defaultDay) => {
+    if (!iso) return defaultDay
+    const d = new Date(iso)
+    return toDayOfYear([d.getDate(), d.getMonth() + 1])
+  }
+
+  const [s, e] = area.period
+  if (!s || !e) return true
+  const areaStart = toDayOfYear(s)
+  const areaEnd = toDayOfYear(e)
+
+  const filterStart = parseIsoToDay(beginIso, 1)
+  const filterEnd = parseIsoToDay(endIso, 365)
+
+  const inInterval = (day, start, end) => (start <= end ? (day >= start && day <= end) : (day >= start || day <= end))
+
+  if (inInterval(areaStart, filterStart, filterEnd)) return true
+  if (inInterval(areaEnd, filterStart, filterEnd)) return true
+  if (inInterval(filterStart, areaStart, areaEnd)) return true
+  if (inInterval(filterEnd, areaStart, areaEnd)) return true
+  return false
 }
 
 const filteredSensitivityAreas = computed(() => {
