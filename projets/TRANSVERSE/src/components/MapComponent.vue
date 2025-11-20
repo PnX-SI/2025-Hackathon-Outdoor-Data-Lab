@@ -11,6 +11,14 @@ const props = defineProps({
   currentMonth: {
     type: Number,
     default: 1
+  },
+  beginDate: {
+    type: String,
+    default: null
+  },
+  endDate: {
+    type: String,
+    default: null
   }
 })
 
@@ -43,6 +51,8 @@ const createGeoJSON = (month) => {
     }))
   }
 }
+
+
 
 const showSensitivityArea = (coordinatesStr) => {
   const coordinates = JSON.parse(coordinatesStr)
@@ -119,6 +129,9 @@ onMounted(() => {
       data: createGeoJSON(props.currentMonth)
     })
 
+      // Note: sensitivity/regulation areas are not added automatically.
+      // They are shown only when the user clicks "Show on Map" in the Attributes panel.
+
     // Add sensitivity area source
     map.addSource('sensitivity-area', {
       type: 'geojson',
@@ -186,6 +199,8 @@ onMounted(() => {
     onZoomChanged()
   })
 })
+
+// No automatic update of area layers — areas are displayed only via explicit "Show on Map" actions
 
 onUnmounted(() => {
   if (map) {

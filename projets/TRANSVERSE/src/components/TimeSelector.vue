@@ -1,48 +1,48 @@
 <template>
-  <div>
-    <label for="month-select">Select Month:</label>
-    <select id="month-select" v-model="selectedMonth" @change="handleChange">
-      <option value="1">January</option>
-      <option value="2">February</option>
-      <option value="3">March</option>
-      <option value="4">April</option>
-      <option value="5">May</option>
-      <option value="6">June</option>
-      <option value="7">July</option>
-      <option value="8">August</option>
-      <option value="9">September</option>
-      <option value="10">October</option>
-      <option value="11">November</option>
-      <option value="12">December</option>
-    </select>
+  <div class="date-range">
+    <label for="begin-date">Begin date:</label>
+    <input id="begin-date" type="date" v-model="beginDate" @change="emitRange" />
+
+    <label for="end-date" style="margin-left:12px">End date:</label>
+    <input id="end-date" type="date" v-model="endDate" @change="emitRange" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 
-const selectedMonth = ref(1)
-const emit = defineEmits(['month-changed'])
+const beginDate = ref('')
+const endDate = ref('')
+const emit = defineEmits(['date-range-changed'])
 
-const handleChange = () => {
-  emit('month-changed', parseInt(selectedMonth.value))
+const emitRange = () => {
+  // Emit empty string as null to parent if not set
+  emit('date-range-changed', {
+    beginDate: beginDate.value || null,
+    endDate: endDate.value || null
+  })
 }
 </script>
 
 <style scoped>
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 label {
   font-weight: 600;
   font-size: 14px;
+  color: white;
 }
 
-#month-select {
+input[type="date"] {
   padding: 8px 12px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
-  cursor: pointer;
   background: white;
-  min-width: 150px;
-  margin-left: 15px;
+  min-width: 160px;
 }
 </style>

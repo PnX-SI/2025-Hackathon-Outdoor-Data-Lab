@@ -31,10 +31,10 @@
         <div class="value">
           <template v-if="key === 'attributes'">
             <div class="attributes-sections">
-              <div v-if="parsedAttributes.sensitivityAreas && parsedAttributes.sensitivityAreas.length > 0" class="attributes-section">
+              <div v-if="filteredSensitivityAreas && filteredSensitivityAreas.length > 0" class="attributes-section">
                 <h4>Sensitivity Areas</h4>
                 <div
-                  v-for="(area, index) in parsedAttributes.sensitivityAreas"
+                  v-for="(area, index) in filteredSensitivityAreas"
                   :key="'sensitivity-' + index"
                   class="area-item sensitivity-area"
                 >
@@ -53,10 +53,10 @@
                 </div>
               </div>
 
-              <div v-if="parsedAttributes.regulatedAreas && parsedAttributes.regulatedAreas.length > 0" class="attributes-section">
+              <div v-if="filteredRegulatedAreas && filteredRegulatedAreas.length > 0" class="attributes-section">
                 <h4>Regulated Areas</h4>
                 <div
-                  v-for="(area, index) in parsedAttributes.regulatedAreas"
+                  v-for="(area, index) in filteredRegulatedAreas"
                   :key="'regulated-' + index"
                   class="area-item regulated-area"
                 >
@@ -95,6 +95,14 @@ const props = defineProps({
   zoomLevel: {
     type: Number,
     default: 6
+  },
+  beginDate: {
+    type: String,
+    default: null
+  },
+  endDate: {
+    type: String,
+    default: null
   }
 })
 
@@ -111,6 +119,50 @@ const parsedAttributes = computed(() => {
     }
   }
   return {}
+})
+
+const toDate = (iso) => {
+  if (!iso) return null
+  const d = new Date(iso)
+  if (isNaN(d)) return null
+  return d
+}
+
+const periodToDateRange = (periodArray, year) => {
+  if (!periodArray || periodArray.length < 2) return null
+  const [start, end] = periodArray
+  const startDate = new Date(year, (start[1] - 1), start[0])
+  const endDate = new Date(year, (end[1] - 1), end[0])
+  return { startDate, endDate }
+}
+
+const rangesOverlap = (aStart, aEnd, bStart, bEnd) => {
+  return aStart <= bEnd && bStart <= aEnd
+}
+
+const areaMatchesRange = (area, beginIso, endIso) => {
+  if (!beginIso && !endIso) return true
+  const begin = toDate(beginIso)
+  const end = toDate(endIso)
+  if (!area.period) return true
+  const nowYear = (new Date()).getFullYear()
+  const pr = periodToDateRange(area.period, nowYear)
+  if (!pr) return true
+  const areaStart = pr.startDate
+  const areaEnd = pr.endDate
+  const filterStart = begin || new Date(nowYear, 0, 1)
+  const filterEnd = end || new Date(nowYear, 11, 31)
+  return rangesOverlap(areaStart, areaEnd, filterStart, filterEnd)
+}
+
+const filteredSensitivityAreas = computed(() => {
+  const list = (parsedAttributes.value.sensitivityAreas || [])
+  return list.filter(a => areaMatchesRange(a, props.beginDate, props.endDate))
+})
+
+const filteredRegulatedAreas = computed(() => {
+  const list = (parsedAttributes.value.regulatedAreas || [])
+  return list.filter(a => areaMatchesRange(a, props.beginDate, props.endDate))
 })
 
 // Methods

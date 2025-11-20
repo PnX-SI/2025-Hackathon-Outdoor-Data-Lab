@@ -1,9 +1,11 @@
 <template>
   <div id="app">
     <div id="time-selector">
-      <TimeSelector @month-changed="onMonthChanged" />
-      <span id="selected-info" style="margin-left: auto; font-size: 14px;">
-        Current zoom: <span id="zoom-level">{{ zoomLevel.toFixed(1) }}</span>
+      <TimeSelector @date-range-changed="onDateRangeChanged" />
+      <span id="selected-info" style="margin-left: auto; font-size: 14px; display:flex; gap:12px; align-items:center;">
+        <span>Begin: <strong>{{ beginDate || '—' }}</strong></span>
+        <span>End: <strong>{{ endDate || '—' }}</strong></span>
+        <span>Current zoom: <span id="zoom-level">{{ zoomLevel.toFixed(1) }}</span></span>
       </span>
     </div>
 
@@ -11,11 +13,15 @@
       <MapComponent
         ref="mapComponent"
         :current-month="currentMonth"
+        :begin-date="beginDate"
+        :end-date="endDate"
         @zoom-changed="onZoomChanged"
         @map-click="onMapClick"
       />
       <AttributesPanel
         :attributes="selectedAttributes"
+        :begin-date="beginDate"
+        :end-date="endDate"
         @clear-attributes="clearAttributes"
         @show-sensitivity-area="showSensitivityArea"
         @show-regulated-area="showRegulatedArea"
@@ -33,6 +39,8 @@ import AttributesPanel from './components/AttributesPanel.vue'
 const currentMonth = ref(1)
 const zoomLevel = ref(6.0)
 const selectedAttributes = ref(null)
+const beginDate = ref(null)
+const endDate = ref(null)
 const windowWidth = ref(window.innerWidth)
 const isMobile = computed(() => windowWidth.value < 768)
 
@@ -54,6 +62,10 @@ const onMonthChanged = (month) => {
   currentMonth.value = month
 }
 
+const onDateRangeChanged = ({ beginDate: b, endDate: e }) => {
+  beginDate.value = b
+  endDate.value = e
+}
 const onZoomChanged = (zoom) => {
   zoomLevel.value = zoom
 }
