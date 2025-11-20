@@ -1,6 +1,5 @@
 <template>
   <div id="attributes-panel">
-    <h2>Attributes</h2>
     <div v-if="!attributes">
       <div id="zoom-info" class="zoom-info" :class="{ 'zoom-info-hidden': zoomLevel < 5 }">
         <template v-if="zoomLevel < 5">
@@ -27,7 +26,7 @@
         :key="key"
         class="attribute-item"
       >
-        <div class="label">{{ key }}</div>
+        <div class="label" v-if="key !== 'attributes'">{{ key }}</div>
         <div class="value">
           <template v-if="key === 'attributes'">
             <div class="attributes-sections">
@@ -206,7 +205,7 @@ const formatPeriod = (periodArray) => {
 @media (min-width: 1400px) {
   #attributes-panel {
     width: 450px;
-    padding: 32px;
+    padding: 10px;
     font-size: 16px;
   }
 }
@@ -314,14 +313,14 @@ const formatPeriod = (periodArray) => {
 .attribute-item .label {
   font-weight: 600;
   color: #555;
-  font-size: 12px;
+  font-size: 10px;
   text-transform: uppercase;
   margin-bottom: 4px;
 }
 
 .attribute-item .value {
   color: #2c3e50;
-  font-size: 14px;
+  font-size: 10px;
 }
 
 .clear-btn {
@@ -348,10 +347,10 @@ const formatPeriod = (periodArray) => {
 .show-area-btn {
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 10px;
   margin-top: 4px;
 }
 
@@ -405,28 +404,28 @@ const formatPeriod = (periodArray) => {
 /* Larger screens - scale up nested elements */
 @media (min-width: 1400px) {
   #attributes-panel h2 {
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .area-item {
-    padding: 14px;
-    margin-bottom: 14px;
+    padding: 10px;
+    margin-bottom: 10px;
   }
 
   .area-header strong {
-    font-size: 15px;
+    font-size: 10px;
   }
 
   .area-description {
-    font-size: 14px;
+    font-size: 9px;
   }
 
   .area-period {
-    font-size: 13px;
+    font-size: 8px;
   }
 
   .attribute-item {
-    padding: 16px;
+    padding: 12px;
   }
 }
 
