@@ -18,9 +18,9 @@ services:
       start_period: 30s
       timeout: 5s
 
-  django-app1:
+  django_app:
     build: .
-    container_name: django-app1
+    container_name: django_app
     ports:
       - "8000:8000"
     depends_on:

@@ -16,7 +16,7 @@ DIR_BIN = .venv/bin/
 
 .PHONY: build_app
 build_app:
-	docker build  .
+	docker build . -t django_app --no-cache
 
 .PHONY: serve
 serve:
