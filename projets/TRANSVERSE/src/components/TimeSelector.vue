@@ -1,25 +1,45 @@
 <template>
   <div class="date-range">
-    <label for="begin-date">Begin date:</label>
-    <input id="begin-date" type="date" v-model="beginDate" @change="emitRange" />
-
-    <label for="end-date" style="margin-left:12px">End date:</label>
-    <input id="end-date" type="date" v-model="endDate" @change="emitRange" />
+    <div class="date-select-group">
+      <label>Begin day:</label>
+      <select v-model="beginDay" @change="emitRange">
+        <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
+      </select>
+      <select v-model="beginMonth" @change="emitRange">
+        <option v-for="(m, idx) in months" :key="m" :value="idx+1">{{ m }}</option>
+      </select>
+    </div>
+    <div class="date-select-group" style="margin-left:16px">
+      <label>End day:</label>
+      <select v-model="endDay" @change="emitRange">
+        <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
+      </select>
+      <select v-model="endMonth" @change="emitRange">
+        <option v-for="(m, idx) in months" :key="m" :value="idx+1">{{ m }}</option>
+      </select>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 
-const beginDate = ref('')
-const endDate = ref('')
+const beginDay = ref(1)
+const beginMonth = ref(1)
+const endDay = ref(31)
+const endMonth = ref(12)
+const months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+]
 const emit = defineEmits(['date-range-changed'])
 
 const emitRange = () => {
-  // Emit empty string as null to parent if not set
   emit('date-range-changed', {
-    beginDate: beginDate.value || null,
-    endDate: endDate.value || null
+    beginDay: beginDay.value,
+    beginMonth: beginMonth.value,
+    endDay: endDay.value,
+    endMonth: endMonth.value
   })
 }
 </script>
@@ -31,18 +51,22 @@ const emitRange = () => {
   gap: 8px;
 }
 
+.date-select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 label {
   font-weight: 600;
   font-size: 14px;
   color: white;
 }
-
-input[type="date"] {
+.date-select-group select {
   padding: 8px 12px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
   background: white;
-  min-width: 160px;
 }
 </style>

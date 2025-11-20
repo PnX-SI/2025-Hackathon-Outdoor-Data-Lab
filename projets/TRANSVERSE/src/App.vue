@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { ref, onMounted, computed, onUnmounted, watch } from 'vue'
 import TimeSelector from './components/TimeSelector.vue'
 import MapComponent from './components/MapComponent.vue'
 import AttributesPanel from './components/AttributesPanel.vue'
@@ -64,9 +64,12 @@ const onMonthChanged = (month) => {
   currentMonth.value = month
 }
 
-const onDateRangeChanged = ({ beginDate: b, endDate: e }) => {
-  beginDate.value = b
-  endDate.value = e
+const pad = (n) => n.toString().padStart(2, '0')
+const currentYear = new Date().getFullYear()
+const onDateRangeChanged = ({ beginDay, beginMonth, endDay, endMonth }) => {
+  // Convert to ISO date strings (YYYY-MM-DD)
+  beginDate.value = `${currentYear}-${pad(beginMonth)}-${pad(beginDay)}`
+  endDate.value = `${currentYear}-${pad(endMonth)}-${pad(endDay)}`
 }
 const onZoomChanged = (zoom) => {
   zoomLevel.value = zoom
@@ -106,18 +109,130 @@ const restoreSelectedFeature = () => {
   }
 }
 
-const showSensitivityArea = (coordinatesStr) => {
+const displayedSensitivityAreas = ref(new Set())
+const displayedRegulatedAreas = ref(new Set())
+const displayedSensitivityMap = ref(new Map()) // str -> area obj
+const displayedRegulatedMap = ref(new Map())
+
+const areaPeriodOverlapsFilter = (area, filterStartIso, filterEndIso) => {
+  const nowYear = new Date().getFullYear()
+  const [start, end] = area.period || []
+  if (!start || !end) return true
+  const startDate = new Date(nowYear, (start[1] - 1), start[0])
+  const endDate = new Date(nowYear, (end[1] - 1), end[0])
+  const filterStart = filterStartIso ? new Date(filterStartIso) : new Date(nowYear, 0, 1)
+  const filterEnd = filterEndIso ? new Date(filterEndIso) : new Date(nowYear, 11, 31)
+  return startDate <= filterEnd && filterStart <= endDate
+}
+
+const showSensitivityArea = (areaOrStr) => {
+  // Accept either area object (from AttributesPanel) or coordinates string
+  let area = null
+  if (typeof areaOrStr === 'string') {
+    // no period info available
+    const coords = JSON.parse(areaOrStr)
+    area = { coordinates: coords }
+  } else {
+    area = areaOrStr
+  }
+  const str = JSON.stringify(area.coordinates)
+  if (displayedSensitivityAreas.value.has(str)) {
+    displayedSensitivityAreas.value.delete(str)
+    displayedSensitivityMap.value.delete(str)
+  } else {
+    displayedSensitivityAreas.value.add(str)
+    displayedSensitivityMap.value.set(str, area)
+  }
+  updateDisplayedAreas()
+}
+
+const showRegulatedArea = (areaOrStr) => {
+  let area = null
+  if (typeof areaOrStr === 'string') {
+    const coords = JSON.parse(areaOrStr)
+    area = { coordinates: coords }
+  } else {
+    area = areaOrStr
+  }
+  const str = JSON.stringify(area.coordinates)
+  if (displayedRegulatedAreas.value.has(str)) {
+    displayedRegulatedAreas.value.delete(str)
+    displayedRegulatedMap.value.delete(str)
+  } else {
+    displayedRegulatedAreas.value.add(str)
+    displayedRegulatedMap.value.set(str, area)
+  }
+  updateDisplayedAreas()
+}
+
+const updateDisplayedAreas = () => {
   if (mapComponent.value) {
-    mapComponent.value.showSensitivityArea(coordinatesStr)
+    const allAreas = [
+      ...Array.from(displayedSensitivityAreas.value),
+      ...Array.from(displayedRegulatedAreas.value)
+    ]
+    mapComponent.value.showSensitivityAreas(allAreas)
   }
 }
 
-const showRegulatedArea = (coordinatesStr) => {
-  // For now, use the same method as sensitivity areas (they use the same visual styling)
-  if (mapComponent.value) {
-    mapComponent.value.showSensitivityArea(coordinatesStr)
-  }
-}
+// Remove hidden areas when date filter changes (attributes disappear)
+
+const filteredSensitivityCoordinates = computed(() => {
+  if (!selectedAttributes.value || !selectedAttributes.value.attributes) return new Set()
+  try {
+    const attrs = JSON.parse(selectedAttributes.value.attributes)
+    if (!attrs.sensitivityAreas) return new Set()
+    return new Set(attrs.sensitivityAreas.filter(area => {
+      // Use same filtering as AttributesPanel
+      const nowYear = new Date().getFullYear()
+      const [start, end] = area.period || []
+      if (!start || !end) return true
+      const startDate = new Date(nowYear, (start[1] - 1), start[0])
+      const endDate = new Date(nowYear, (end[1] - 1), end[0])
+      const filterStart = beginDate.value ? new Date(beginDate.value) : new Date(nowYear, 0, 1)
+      const filterEnd = endDate.value ? new Date(endDate.value) : new Date(nowYear, 11, 31)
+      return startDate <= filterEnd && filterStart <= endDate
+    }).map(area => JSON.stringify(area.coordinates)))
+  } catch { return new Set() }
+})
+
+const filteredRegulatedCoordinates = computed(() => {
+  if (!selectedAttributes.value || !selectedAttributes.value.attributes) return new Set()
+  try {
+    const attrs = JSON.parse(selectedAttributes.value.attributes)
+    if (!attrs.regulatedAreas) return new Set()
+    return new Set(attrs.regulatedAreas.filter(area => {
+      // Use same filtering as AttributesPanel
+      const nowYear = new Date().getFullYear()
+      const [start, end] = area.period || []
+      if (!start || !end) return true
+      const startDate = new Date(nowYear, (start[1] - 1), start[0])
+      const endDate = new Date(nowYear, (end[1] - 1), end[0])
+      const filterStart = beginDate.value ? new Date(beginDate.value) : new Date(nowYear, 0, 1)
+      const filterEnd = endDate.value ? new Date(endDate.value) : new Date(nowYear, 11, 31)
+      return startDate <= filterEnd && filterStart <= endDate
+    }).map(area => JSON.stringify(area.coordinates)))
+  } catch { return new Set() }
+})
+
+watch([beginDate, endDate], () => {
+  // Remove any displayed areas whose period no longer overlaps filter
+  const fStart = beginDate.value
+  const fEnd = endDate.value
+  displayedSensitivityMap.value.forEach((area, str) => {
+    if (!areaPeriodOverlapsFilter(area, fStart, fEnd)) {
+      displayedSensitivityMap.value.delete(str)
+      displayedSensitivityAreas.value.delete(str)
+    }
+  })
+  displayedRegulatedMap.value.forEach((area, str) => {
+    if (!areaPeriodOverlapsFilter(area, fStart, fEnd)) {
+      displayedRegulatedMap.value.delete(str)
+      displayedRegulatedAreas.value.delete(str)
+    }
+  })
+  updateDisplayedAreas()
+})
 </script>
 
 <style>

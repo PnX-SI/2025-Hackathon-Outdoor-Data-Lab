@@ -44,7 +44,7 @@
                   <div class="area-description">{{ area.description }}</div>
                   <div class="area-period">Period: {{ formatPeriod(area.period) }}</div>
                   <button
-                    @click="handleShowSensitivityArea(JSON.stringify(area.coordinates))"
+                    @click="handleShowSensitivityArea(area)"
                     class="show-area-btn small"
                   >
                     Show on Map
@@ -65,7 +65,7 @@
                   </div>
                   <div class="area-description">{{ area.description }}</div>
                   <button
-                    @click="handleShowRegulatedArea(JSON.stringify(area.coordinates))"
+                    @click="handleShowRegulatedArea(area)"
                     class="show-area-btn small"
                   >
                     Show on Map
@@ -169,12 +169,13 @@ const handleClearAttributes = () => {
   emit('clear-attributes')
 }
 
-const handleShowSensitivityArea = (coordinatesStr) => {
-  emit('show-sensitivity-area', coordinatesStr)
+const handleShowSensitivityArea = (area) => {
+  // Emit the full area object so the parent can track period + coordinates
+  emit('show-sensitivity-area', area)
 }
 
-const handleShowRegulatedArea = (coordinatesStr) => {
-  emit('show-regulated-area', coordinatesStr)
+const handleShowRegulatedArea = (area) => {
+  emit('show-regulated-area', area)
 }
 
 const formatPeriod = (periodArray) => {

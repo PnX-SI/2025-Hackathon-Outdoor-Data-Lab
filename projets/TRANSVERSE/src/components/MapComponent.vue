@@ -24,6 +24,7 @@ const props = defineProps({
 
 const emit = defineEmits(['zoom-changed', 'map-click'])
 
+
 let map = null
 let zoom = ref(10)
 
@@ -52,21 +53,22 @@ const createGeoJSON = (month) => {
   }
 }
 
-
-
-const showSensitivityArea = (coordinatesStr) => {
-  const coordinates = JSON.parse(coordinatesStr)
-  const geojson = {
-    type: 'FeatureCollection',
-    features: [{
+const showSensitivityAreas = (coordinatesArr) => {
+  // coordinatesArr: array of JSON.stringify(coordinates)
+  const features = coordinatesArr.map(str => {
+    const coordinates = JSON.parse(str)
+    return {
       type: 'Feature',
       geometry: {
         type: 'Polygon',
         coordinates: [coordinates]
       }
-    }]
+    }
+  })
+  const geojson = {
+    type: 'FeatureCollection',
+    features
   }
-
   const source = map.getSource('sensitivity-area')
   if (source) {
     source.setData(geojson)
@@ -209,7 +211,7 @@ onUnmounted(() => {
 })
 
 defineExpose({
-  showSensitivityArea,
+  showSensitivityAreas,
   clearSensitivityArea
 })
 </script>
