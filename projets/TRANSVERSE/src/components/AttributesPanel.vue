@@ -29,10 +29,51 @@
       >
         <div class="label">{{ key }}</div>
         <div class="value">
-          <template v-if="key === 'sensitivityArea'">
-            <button @click="handleShowSensitivityArea(value)" class="show-area-btn">
-              Show on Map
-            </button>
+          <template v-if="key === 'attributes'">
+            <div class="attributes-sections">
+              <div v-if="parsedAttributes.sensitivityAreas && parsedAttributes.sensitivityAreas.length > 0" class="attributes-section">
+                <h4>Sensitivity Areas</h4>
+                <div
+                  v-for="(area, index) in parsedAttributes.sensitivityAreas"
+                  :key="'sensitivity-' + index"
+                  class="area-item sensitivity-area"
+                >
+                  <div class="area-header">
+                    <strong>{{ area.name }}</strong>
+                    <span class="area-type">{{ area.type }}</span>
+                  </div>
+                  <div class="area-description">{{ area.description }}</div>
+                  <div class="area-period">Period: {{ formatPeriod(area.period) }}</div>
+                  <button
+                    @click="handleShowSensitivityArea(JSON.stringify(area.coordinates))"
+                    class="show-area-btn small"
+                  >
+                    Show on Map
+                  </button>
+                </div>
+              </div>
+
+              <div v-if="parsedAttributes.regulatedAreas && parsedAttributes.regulatedAreas.length > 0" class="attributes-section">
+                <h4>Regulated Areas</h4>
+                <div
+                  v-for="(area, index) in parsedAttributes.regulatedAreas"
+                  :key="'regulated-' + index"
+                  class="area-item regulated-area"
+                >
+                  <div class="area-header">
+                    <strong>{{ area.name }}</strong>
+                    <span class="area-type">{{ area.type }}</span>
+                  </div>
+                  <div class="area-description">{{ area.description }}</div>
+                  <button
+                    @click="handleShowRegulatedArea(JSON.stringify(area.coordinates))"
+                    class="show-area-btn small"
+                  >
+                    Show on Map
+                  </button>
+                </div>
+              </div>
+            </div>
           </template>
           <template v-else>
             {{ value }}
@@ -57,8 +98,22 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['clear-attributes', 'show-sensitivity-area'])
+const emit = defineEmits(['clear-attributes', 'show-sensitivity-area', 'show-regulated-area'])
 
+// Computed properties
+const parsedAttributes = computed(() => {
+  if (props.attributes && props.attributes.attributes) {
+    try {
+      return JSON.parse(props.attributes.attributes)
+    } catch (e) {
+      console.error('Error parsing attributes:', e)
+      return {}
+    }
+  }
+  return {}
+})
+
+// Methods
 const handleClearAttributes = () => {
   emit('clear-attributes')
 }
@@ -66,33 +121,94 @@ const handleClearAttributes = () => {
 const handleShowSensitivityArea = (coordinatesStr) => {
   emit('show-sensitivity-area', coordinatesStr)
 }
+
+const handleShowRegulatedArea = (coordinatesStr) => {
+  emit('show-regulated-area', coordinatesStr)
+}
+
+const formatPeriod = (periodArray) => {
+  if (!periodArray || periodArray.length === 0) return 'Not specified'
+
+  const monthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ]
+
+  return periodArray.map(([day, month]) => {
+    return `${day}/${monthNames[month - 1]}`
+  }).join(' - ')
+}
 </script>
 
 <style scoped>
-#attributes-panel {
-  width: 300px;
-  background: #f8f9fa;
-  border-left: 1px solid #dee2e6;
-  overflow-y: auto;
-  padding: 20px;
+.show-area-btn.small {
+  padding: 4px 8px;
+  font-size: 12px;
 }
 
-/* Responsive design */
-@media (max-width: 767px) {
-  #attributes-panel {
-    width: 100%;
-    height: auto;
-    max-height: 40vh;
-    border-left: none;
-    border-top: 1px solid #dee2e6;
-    flex-shrink: 0;
-  }
+.attributes-sections {
+  margin-top: 10px;
 }
 
-#attributes-panel h2 {
-  font-size: 18px;
+.attributes-section {
   margin-bottom: 15px;
+}
+
+.attributes-section h4 {
+  font-size: 14px;
+  margin-bottom: 8px;
   color: #2c3e50;
+  font-weight: 600;
+}
+
+.area-item {
+  background: #f8f9fa;
+  padding: 8px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.sensitivity-area {
+  border-left: 3px solid #e74c3c;
+}
+
+.regulated-area {
+  border-left: 3px solid #f39c12;
+}
+
+.area-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.area-header strong {
+  color: #2c3e50;
+  font-size: 13px;
+}
+
+.area-type {
+  font-size: 10px;
+  color: #6c757d;
+  text-transform: uppercase;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.area-description {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 4px;
+  font-style: italic;
+}
+
+.area-period {
+  font-size: 11px;
+  color: #6c757d;
+  margin-bottom: 6px;
 }
 
 .attribute-item {

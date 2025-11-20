@@ -18,6 +18,7 @@
         :attributes="selectedAttributes"
         @clear-attributes="clearAttributes"
         @show-sensitivity-area="showSensitivityArea"
+        @show-regulated-area="showRegulatedArea"
       />
     </div>
   </div>
@@ -69,6 +70,13 @@ const clearAttributes = () => {
 }
 
 const showSensitivityArea = (coordinatesStr) => {
+  if (mapComponent.value) {
+    mapComponent.value.showSensitivityArea(coordinatesStr)
+  }
+}
+
+const showRegulatedArea = (coordinatesStr) => {
+  // For now, use the same method as sensitivity areas (they use the same visual styling)
   if (mapComponent.value) {
     mapComponent.value.showSensitivityArea(coordinatesStr)
   }

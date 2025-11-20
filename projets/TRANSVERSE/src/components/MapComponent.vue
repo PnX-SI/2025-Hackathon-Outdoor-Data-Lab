@@ -37,9 +37,8 @@ const createGeoJSON = (month) => {
         id: f.id,
         name: f.name,
         type: f.type,
-        month: f.month,
-        value: f.value,
-        sensitivityArea: JSON.stringify(f.sensitivityArea)
+        description: f.description,
+        attributes: JSON.stringify(f.attributes)
       }
     }))
   }
