@@ -1,8 +1,10 @@
 {% load leaflet_tags %}
+{% load static %}
 
 <head>
     {% leaflet_js %}
     {% leaflet_css %}
+    <script type="text/javascript" src="{% static "main.js" %}"></script>
 </head>
 <body>
     {% leaflet_map "mymap" %}

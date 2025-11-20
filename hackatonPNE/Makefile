@@ -14,9 +14,13 @@ DIR_BIN = .venv/bin/
 
 -include Makefile.local
 
+.PHONY: build_app_no_cache
+build_app_no_cache:
+	docker build . -t django_app --no-cache
+
 .PHONY: build_app
 build_app:
-	docker build . -t django_app --no-cache
+	docker build . -t django_app
 
 .PHONY: serve
 serve:
