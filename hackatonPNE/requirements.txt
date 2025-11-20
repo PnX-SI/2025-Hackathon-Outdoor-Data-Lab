@@ -1,6 +1,7 @@
 asgiref==3.10.0
 Django==5.2.8
 django-filter==25.2
+django-leaflet==0.32.0
 djangorestframework==3.16.1
 djangorestframework-gis==1.2.0
 psycopg==3.2.12

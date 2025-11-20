@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'biodiversity',
     'activity',
+    'leaflet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -125,3 +126,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LEAFLET_CONFIG = {
+    'SPATIAL_EXTENT': (5.0, 44.0, 7.5, 46)
+}
