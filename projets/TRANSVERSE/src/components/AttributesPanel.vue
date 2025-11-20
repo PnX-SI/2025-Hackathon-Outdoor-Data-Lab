@@ -368,7 +368,7 @@ const formatPeriod = (periodArray) => {
 }
 
 .regulated-area .show-area-btn:hover {
-  background: #e67e22;
+  background: #6e3f80ff;
 }
 
 .empty-state {
