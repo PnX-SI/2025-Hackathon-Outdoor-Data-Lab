@@ -256,6 +256,12 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
     <script>
+        // Configuration de l'URL API basée sur l'URL actuelle
+        const currentUrl = window.location;
+        const apiBaseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('apiUrl').value = `${apiBaseUrl}/risk/geojson/`;
+        });
         // Initialisation de la carte
         const map = L.map('map').setView([45.191404,5.620228], 10);
         
