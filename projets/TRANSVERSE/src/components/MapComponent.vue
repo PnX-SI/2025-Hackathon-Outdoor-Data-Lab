@@ -132,6 +132,17 @@ onMounted(() => {
           tileSize: 256,
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }
+        // // Use a different source for terrain and hillshade layers, to improve render quality
+        // terrainSource: {
+        //     type: 'raster-dem',
+        //     url: 'https://demotiles.maplibre.org/terrain-tiles/tiles.json',
+        //     tileSize: 256
+        // },
+        // hillshadeSource: {
+        //     type: 'raster-dem',
+        //     url: 'https://demotiles.maplibre.org/terrain-tiles/tiles.json',
+        //     tileSize: 256
+        // }
       },
       layers: [
         {
@@ -141,15 +152,44 @@ onMounted(() => {
           minzoom: 0,
           maxzoom: 19
         }
+        // {
+        //     id: 'hills',
+        //     type: 'hillshade',
+        //     source: 'hillshadeSource',
+        //     layout: {visibility: 'visible'},
+        //     paint: {'hillshade-shadow-color': '#473B24'}
+        // }
       ]
+      // terrain: {
+      //     source: 'terrainSource',
+      //     exaggeration: 1
+      // },
+      // sky: {}
     },
     center: [ 6.859542070268517, 45.586392639320337 ],
-    zoom: zoom.value
+    zoom: zoom.value,
+    pitch: 45,
+    maxPitch: 85
   })
 
   map.addControl(new maplibregl.NavigationControl(), 'top-right')
 
   map.on('load', () => {
+    // // Add terrain source first
+    map.addSource('terrain', {
+      type: 'raster-dem',
+      url: 'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=[ADD_YOUR_API_KEY]',
+      // tileSize: 256
+    })
+    map.setTerrain({ source: 'terrain', exaggeration: 2.5 })
+
+    // // Set fog for terrain rendering
+    // map.setFog({
+    //   range: [0.5, 12],
+    //   color: 'white',
+    //   'horizon-blend': 0.1
+    // })
+
     // Add features source
     map.addSource('features', {
       type: 'geojson',
