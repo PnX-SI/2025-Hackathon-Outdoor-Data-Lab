@@ -1,0 +1,32 @@
+            {
+                id: 2,
+                name: 'Le lac de Plan Vianney et la brèche du Périer',
+                type: 'Randonnée',
+                coordinates: [[4.8357, 45.7640], [5.3698, 43.2965]],
+                description: "Une randonnée dans les Ecrins",
+                attributes: {
+                    sensitivityAreas: [{
+                        id: 1,
+                        name: "Zone sensible Aigle Royal",
+                        type: "Nidification",
+                        coordinates:  [[4.7, 45.6], [5.0, 45.6], [5.0, 45.9], [4.7, 45.9], [4.7, 45.6]],
+                        period: [[15, 3], [15, 5]],
+                        description: "Une description de zone sensible"
+                    },
+                    {
+                        id: 2,
+                        name: "Autre zone sensible Aigle Royal",
+                        type: "Nidification",
+                        coordinates:  [[4.7, 45.6], [5.0, 45.6], [5.0, 45.9], [4.7, 45.9], [4.7, 45.6]],
+                        period: [[20, 4], [20, 7]],
+                        description: "Une nidification plus tardive"
+                    }],
+                    regulatedAreas: [{
+                        id: 1,
+                        name: "Parc de la Vanoise",
+                        type: "Parc Naturel National",
+                        coordinates:  [[4.7, 45.6], [5.0, 45.6], [5.0, 45.9], [4.7, 45.9], [4.7, 45.6]],
+                        description: "Un parc"
+                    }]
+                }
+            },
