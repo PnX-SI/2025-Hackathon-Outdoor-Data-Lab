@@ -1,5 +1,5 @@
 # Récupération de données Utagawavtt
-===================================
+
 
 A contrario de skitour, Utagawavtt ne propose pas d'API pour récupérer facilement les données accessibles via un compte.
 
