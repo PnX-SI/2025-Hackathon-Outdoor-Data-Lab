@@ -136,16 +136,16 @@ class Scoring:
         """
         goi = grid_of_interest.copy()
         goi["species_presence_sc_ponderated"] = ponderation.species_presence * (
-            goi.species_presence_sc / goi.species_presence_sc.max()
+            goi.species_presence_sc / self.grid.species_presence_sc.max()
         )
         goi["hiking_trails_sc_ponderated"] = ponderation.hiking_trail_presence * (
-            goi.hiking_trails_sc / goi.hiking_trails_sc.max()
+            goi.hiking_trails_sc / self.grid.hiking_trails_sc.max()
         )
         goi["user_frequency_sc_ponderated"] = ponderation.user_presence * (
-            goi.user_frequency_sc / goi.user_frequency_sc.max()
+            goi.user_frequency_sc / self.grid.user_frequency_sc.max()
         )
         goi["habitat_presence_sc_ponderated"] = ponderation.habitat_presence * (
-            goi.habitat_presence_sc / goi.habitat_presence_sc.max()
+            goi.habitat_presence_sc / self.grid.habitat_presence_sc.max()
         )
         goi["habitat_presence_sc_ponderated"] = goi[
             "habitat_presence_sc_ponderated"
