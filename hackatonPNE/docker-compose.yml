@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.5
+    container_name: postgres
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=hackathondb
+      - POSTGRES_PASSWORD=hackathonpasswd
+      - POSTGRES_USER=hackathonadmin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hackathonadmin", "-d", "hackathondb"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+
+  django_app:
+    build: .
+    container_name: django_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app/
+    # environment:
+    #   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+    #   DEBUG: ${DEBUG}
+    #   DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+    #   DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+    #   DATABASE_ENGINE: ${DATABASE_ENGINE}
+    #   DATABASE_NAME: ${DATABASE_NAME}
+    #   DATABASE_USERNAME: ${DATABASE_USERNAME}
+  
+    #   DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    #   DATABASE_HOST: ${DATABASE_HOST}
+    #   DATABASE_PORT: ${DATABASE_PORT}
+    # env_file:
+    #   - .env
+
+volumes:
+  postgres:
