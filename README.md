@@ -1,11 +1,13 @@
 # Hackathon Outdoor Data Lab 2025
 
-Mercredi 19 novembre et jeudi 20 novembre à 16h30. Voiron - Campus de Tremplin Sport Formation.
+Les 19 et 20 novembre 2025, à Voiron - Campus de Tremplin Sport Formation.
+
+Synthèse, démo des projets et suites du hackathon : https://www.ecrins-parcnational.fr/actualite/hackathon-outdoor-data-lab.
 
 ## Au programme
 
-- Imaginer et prototyper des solutions numériques autour de cas concrets de territoires : les réserves naturelles d’ASTERS en Haute-Savoie, le PNR du Vercors, les ENS du Département de l’Isère, la réserve naturelle nationale des gorges de l’Ardèche du SGGA, et le Parc national des Écrins ;
-- Répartitions en équipe autour de ces cas concrets, selon vos profils ;
+- Imaginer et prototyper des solutions numériques autour de cas concrets de territoires : les réserves naturelles d’ASTERS en Haute-Savoie, le PNR du Vercors, les ENS du Département de l’Isère, la réserve naturelle nationale des gorges de l’Ardèche du SGGA, et le Parc national des Écrins
+- Répartitions en équipe autour de ces cas concrets, selon les profils
 - Croisements de données issues des plateformes du collectif Outdoor Data Lab : GeoNature, Geotrek, Biodiv’sports, Suricate et Outdoorvision, et plus !
 
 ## Les structures participantes
